@@ -587,4 +587,22 @@ defmodule BypassTest do
       Bypass.open(:error)
     end
   end
+
+  test "Strange formed paths" do
+    path = "/a/strange/path/dotted:strange.string.that.may:happen"
+    path_parts = ["a", "strange", "path", "dotted:strange.string.that.may:happen"]
+
+    bypass = Bypass.open()
+
+    Bypass.expect(
+      bypass,
+      "POST",
+      path_parts,
+      fn conn ->
+        Plug.Conn.send_resp(conn, 200, "")
+      end
+    )
+
+    assert {:ok, 200, ""} = request(bypass.port, path)
+  end
 end
